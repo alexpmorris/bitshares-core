@@ -61,9 +61,9 @@ namespace graphene { namespace chain {
       /// If this flag is set the entire order must be filled or the operation is rejected
       bool fill_or_kill = false;
 
-	   struct limit_order_flags {
-		  optional<bool> isCoreBuySell;  //not set: default behavior, false: BUY/SELL TEST, true: BUY/SELL CORE
-	   };
+      struct limit_order_flags {
+	  optional<bool> isCoreBuySell;  //not set: default behavior, false: BUY/SELL TEST, true: BUY/SELL CORE
+      };
       extension<limit_order_flags> extensions;  //replaces: extensions_type   extensions;
 
       pair<asset_id_type,asset_id_type> get_market()const
