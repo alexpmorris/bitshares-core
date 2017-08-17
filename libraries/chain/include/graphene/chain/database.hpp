@@ -359,9 +359,9 @@ namespace graphene { namespace chain {
           * 3 - both were filled
           */
          ///@{
-		   template<typename OrderType>
-		   int rounded_match( const limit_order_object& usd, const OrderType& core, const price& match_price,
-									 asset& usd_pays, asset& usd_receives, asset& core_pays, asset& core_receives);
+	 template<typename OrderType>
+	 int rounded_match( const limit_order_object& usd, const OrderType& core, const price& match_price,
+			    asset& usd_pays, asset& usd_receives, asset& core_pays, asset& core_receives);
          template<typename OrderType>
          int match( const limit_order_object& bid, const OrderType& ask, const price& match_price );
          int match( const limit_order_object& bid, const limit_order_object& ask, const price& trade_price );
