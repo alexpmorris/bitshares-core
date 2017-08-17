@@ -1933,7 +1933,7 @@ public:
                                  string symbol_to_sell,
                                  string min_to_receive,
                                  string symbol_to_receive,
-								         fc::optional<graphene::chain::limit_order_create_operation::limit_order_flags>  order_flags,
+				 fc::optional<graphene::chain::limit_order_create_operation::limit_order_flags>  order_flags,
                                  uint32_t timeout_sec = 0,
                                  bool   fill_or_kill = false,
                                  bool   broadcast = false
@@ -1949,11 +1949,11 @@ public:
          op.expiration = fc::time_point::now() + fc::seconds(timeout_sec);
       op.fill_or_kill = fill_or_kill;
 
-	   if (order_flags && order_flags.valid()) {
-			extension<graphene::chain::limit_order_create_operation::limit_order_flags> ext;
-			ext.value = *order_flags;
-			op.extensions = ext;
-	   }
+      if (order_flags && order_flags.valid()) {
+	extension<graphene::chain::limit_order_create_operation::limit_order_flags> ext;
+	ext.value = *order_flags;
+	op.extensions = ext;
+      }
 
       signed_transaction tx;
       tx.operations.push_back(op);
@@ -3781,7 +3781,7 @@ signed_transaction wallet_api::sell_asset(string seller_account,
                                           string symbol_to_sell,
                                           string min_to_receive,
                                           string symbol_to_receive,
-										            fc::optional<graphene::chain::limit_order_create_operation::limit_order_flags>  order_flags,
+					  fc::optional<graphene::chain::limit_order_create_operation::limit_order_flags>  order_flags,
                                           uint32_t expiration,
                                           bool   fill_or_kill,
                                           bool   broadcast)
@@ -3810,7 +3810,7 @@ signed_transaction wallet_api::buy( string buyer_account,
                                     bool broadcast )
 {
    fc::optional<graphene::chain::limit_order_create_operation::limit_order_flags>  order_flags;
-	return my->sell_asset( buyer_account, std::to_string( rate * amount ), quote,
+   return my->sell_asset( buyer_account, std::to_string( rate * amount ), quote,
                           std::to_string( amount ), base, order_flags, 0, false, broadcast );
 }
 
