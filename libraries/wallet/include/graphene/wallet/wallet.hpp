@@ -896,6 +896,7 @@ class wallet_api
                                     string   symbol_to_sell,
                                     string min_to_receive,
                                     string   symbol_to_receive,
+                                    fc::optional<graphene::chain::limit_order_create_operation::limit_order_flags>  order_flags,
                                     uint32_t timeout_sec = 0,
                                     bool     fill_or_kill = false,
                                     bool     broadcast = false);
