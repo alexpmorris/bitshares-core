@@ -218,7 +218,7 @@ int database::rounded_match( const limit_order_object& usd, const OrderType& cor
 	bool isCoreBuySell = false;
 	bool isTestBuySell = false;
 	graphene::chain::limit_order_create_operation::limit_order_flags get_order_flags;
-	get_order_flags = usd.extensions.value;
+	get_order_flags = usd.extensions;
 
 	if (get_order_flags.isCoreBuySell && get_order_flags.isCoreBuySell.valid()) {
 		if (*get_order_flags.isCoreBuySell) isCoreBuySell = true; else 
