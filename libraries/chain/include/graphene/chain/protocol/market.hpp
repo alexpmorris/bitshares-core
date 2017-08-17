@@ -23,6 +23,7 @@
  */
 #pragma once
 #include <graphene/chain/protocol/base.hpp>
+#include <graphene/chain/protocol/ext.hpp>
 
 namespace graphene { namespace chain { 
 
@@ -59,7 +60,11 @@ namespace graphene { namespace chain {
 
       /// If this flag is set the entire order must be filled or the operation is rejected
       bool fill_or_kill = false;
-      extensions_type   extensions;
+
+	   struct limit_order_flags {
+		  optional<bool> isCoreBuySell;  //not set: default behavior, false: BUY/SELL TEST, true: BUY/SELL CORE
+	   };
+      extension<limit_order_flags> extensions;  //replaces: extensions_type   extensions;
 
       pair<asset_id_type,asset_id_type> get_market()const
       {
@@ -166,7 +171,7 @@ FC_REFLECT( graphene::chain::call_order_update_operation::fee_parameters_type, (
 /// THIS IS THE ONLY VIRTUAL OPERATION THUS FAR... 
 FC_REFLECT( graphene::chain::fill_order_operation::fee_parameters_type,  )
 
-
+FC_REFLECT( graphene::chain::limit_order_create_operation::limit_order_flags, (isCoreBuySell) )
 FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(extensions))
 FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(fee_paying_account)(order)(extensions) )
 FC_REFLECT( graphene::chain::call_order_update_operation, (fee)(funding_account)(delta_collateral)(delta_debt)(extensions) )
