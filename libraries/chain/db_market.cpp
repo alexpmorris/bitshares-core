@@ -208,10 +208,10 @@ template<typename OrderType>
 int database::rounded_match( const limit_order_object& usd, const OrderType& core, const price& match_price,
 			     asset& usd_pays, asset& usd_receives, asset& core_pays, asset& core_receives) 
 {
-	share_type usd_max_counter_size = 0;
-	share_type core_max_counter_size = 0;
-    	auto usd_for_sale = usd.amount_for_sale();
-    	auto core_for_sale = core.amount_for_sale();
+    typedef boost::multiprecision::uint128_t uint128_t;
+    share_type usd_max_counter_size = 0;
+    auto usd_for_sale = usd.amount_for_sale();
+    auto core_for_sale = core.amount_for_sale();
 
 	// isCoreBuySell = false, BTS/TEST or TEST:BTS  (ie. BUY TEST / SELL TEST)
 	// isCoreBuySell = true, TEST/BTS or BTS:TEST  (ie. BUY CORE / SELL CORE)
@@ -230,17 +230,26 @@ int database::rounded_match( const limit_order_object& usd, const OrderType& cor
 
 	if (order_size_greater_than_book_size) {
 		  if (isCoreBuySell) {
-			  usd_max_counter_size = (usd.amount_to_receive().amount.value * core.sell_price.quote.amount.value)/core.sell_price.base.amount.value;
-			   if (usd_max_counter_size < usd_for_sale.amount) {
+			  usd_max_counter_size = (uint128_t(usd.amount_to_receive().amount.value) * core.sell_price.quote.amount.value*10 +1)/core.sell_price.base.amount.value;
+			  usd_max_counter_size = usd_max_counter_size.value * 0.10;
+			  if (usd_max_counter_size < usd_for_sale.amount) {
 				   usd_for_sale.amount = usd_max_counter_size;
-			   }
+			  }
 		  }
 	}
 	if (order_size_less_than_book_size) {
 		if (isTestBuySell) {
-		   core_max_counter_size = (usd.amount_to_receive().amount.value * core.sell_price.quote.amount.value)/core.sell_price.base.amount.value;
-		   if (core_max_counter_size < usd_for_sale.amount) {
-			   usd_for_sale.amount = core_max_counter_size;
+		   usd_max_counter_size = (uint128_t(usd.amount_to_receive().amount.value) * core.sell_price.quote.amount.value*10 +1)/core.sell_price.base.amount.value;
+		   usd_max_counter_size = usd_max_counter_size.value * 0.10;
+		   if (usd_max_counter_size < usd_for_sale.amount) {
+			   usd_for_sale.amount = usd_max_counter_size;
+		   }
+		} else
+		if (isCoreBuySell) {
+		   usd_max_counter_size = (uint128_t(usd.amount_to_receive().amount.value) * core.sell_price.quote.amount.value*10 +1)/core.sell_price.base.amount.value;
+		   usd_max_counter_size = usd_max_counter_size.value * 0.10;
+		   if (usd_max_counter_size < usd_for_sale.amount) {
+			   usd_for_sale.amount = usd_max_counter_size;
 		   }
 		}
 	}
@@ -248,7 +257,9 @@ int database::rounded_match( const limit_order_object& usd, const OrderType& cor
    if( usd_for_sale <= core_for_sale * match_price )
    {
       core_receives = usd_for_sale;
-      usd_receives  = usd_for_sale * match_price;
+      usd_receives.amount = (uint128_t(usd_for_sale.amount.value) * match_price.base.amount.value*10 +1)/match_price.quote.amount.value;
+      usd_receives.amount = usd_receives.amount.value * 0.1;
+      usd_receives.asset_id = core_for_sale.asset_id;
    }
    else
    {
@@ -257,7 +268,9 @@ int database::rounded_match( const limit_order_object& usd, const OrderType& cor
       //Although usd_for_sale is greater than core_for_sale * match_price, core_for_sale == usd_for_sale * match_price
       //Removing the assert seems to be safe -- apparently no asset is created or destroyed.
       usd_receives = core_for_sale;
-      core_receives = core_for_sale * match_price;
+      core_receives.amount = (uint128_t(core_for_sale.amount.value) * match_price.quote.amount.value*10 +1)/match_price.base.amount.value;
+      core_receives.amount = core_receives.amount.value * 0.1;
+      core_receives.asset_id = usd_for_sale.asset_id;
    }
 
    core_pays = usd_receives;
@@ -269,16 +282,20 @@ int database::rounded_match( const limit_order_object& usd, const OrderType& cor
    share_type pay_refund = 0;
    if (isTestBuySell || isCoreBuySell) {
 	if (order_size_greater_than_book_size) {
-	   if (isCoreBuySell) pay_refund = (usd_receives * usd.sell_price).amount.value - core_receives.amount.value;
+	   if (isCoreBuySell) {
+		   pay_refund = ((uint128_t(usd_receives.amount.value) * usd.sell_price.base.amount.value*10 +1)/usd.sell_price.quote.amount.value);
+		   pay_refund = pay_refund.value*0.1 - core_receives.amount.value;
+	   }
 	}
 	if (order_size_less_than_book_size) {
-	   if (isTestBuySell) pay_refund = ((usd_receives.amount.value * usd.sell_price.base.amount.value)/usd.sell_price.quote.amount.value) - core_receives.amount.value;
+	   if (isTestBuySell || isCoreBuySell) {
+		   pay_refund = ((uint128_t(usd_receives.amount.value) * usd.sell_price.base.amount.value*10 +1)/usd.sell_price.quote.amount.value);
+		   pay_refund = pay_refund.value*0.1 - core_receives.amount.value;
+	   }
 	}
-
 	//make sure pay_refund doesn't exceed for_sale(), and also toss any remainder that doesn't match up versus larger counter-order
 	if ((core_pays.amount.value < core.amount_for_sale().amount.value) || (pay_refund > usd.amount_for_sale().amount)) 
 	   pay_refund = usd.amount_for_sale().amount - core_receives.amount.value;
-	if (core_pays.amount.value < core.amount_for_sale().amount.value)
    }
    if (pay_refund > 0) {
 	asset refunded = asset(pay_refund,usd_pays.asset_id);
