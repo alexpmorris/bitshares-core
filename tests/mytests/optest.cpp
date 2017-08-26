@@ -363,7 +363,7 @@ BOOST_AUTO_TEST_CASE( rounded_match_test_cases )
 
    transfer( committee_account(db), buyer_account, core_asset.amount( 100000 ) );
    transfer( nathan_account, seller_account, test_asset.amount(100000) );
-   //auto order = create_sell_order_with_ext( db, trx, seller_account, core_asset.amount(15000), test_asset.amount(1000), true );
+   //auto order = create_sell_order_with_ext( seller_account, core_asset.amount(15000), test_asset.amount(1000), true );
 
 	/*struct order_ext {
 	  optional<bool> isCoreBuySell;
@@ -488,7 +488,7 @@ BOOST_AUTO_TEST_CASE( taker_sells_overpays_huge_lot_isTestBuySell )
    BOOST_CHECK_EQUAL( get_balance( buyer_account, core_asset ), 85000 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, seller_account, test_asset.amount(5000), core_asset.amount(100) , false );
+   auto unmatched = create_sell_order_with_ext( seller_account, test_asset.amount(5000), core_asset.amount(100) , false );
    //print_market( "", "" );
    BOOST_CHECK( !db.find( first_id ) );
    if( unmatched ) wdump((*unmatched));
@@ -533,7 +533,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_overpays_huge_lot_isTestBuySell )
    BOOST_CHECK_EQUAL( get_balance( seller_account, test_asset ), 98000 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, core_asset.amount(8000), test_asset.amount(200), false );
+   auto unmatched = create_sell_order_with_ext( buyer_account, core_asset.amount(8000), test_asset.amount(200), false );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    BOOST_CHECK( db.find( second_id ) );
@@ -579,7 +579,7 @@ BOOST_AUTO_TEST_CASE( taker_sells_overpays_huge_lot_isCoreBuySell )
    BOOST_CHECK_EQUAL( get_balance( buyer_account, core_asset ), 85000 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, seller_account, test_asset.amount(5000), core_asset.amount(100) , true );
+   auto unmatched = create_sell_order_with_ext( seller_account, test_asset.amount(5000), core_asset.amount(100) , true );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    if( unmatched ) wdump((*unmatched));
@@ -624,7 +624,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_overpays_huge_lot_isCoreBuySell )
    BOOST_CHECK_EQUAL( get_balance( seller_account, core_asset ), 98000 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, test_asset.amount(8000), core_asset.amount(200), true );
+   auto unmatched = create_sell_order_with_ext( buyer_account, test_asset.amount(8000), core_asset.amount(200), true );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    BOOST_CHECK( db.find( second_id ) );
@@ -671,7 +671,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_overpays_huge_lot_isCoreBuySell_2 )
    BOOST_CHECK_EQUAL( get_balance( seller_account, core_asset ), 89000 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, test_asset.amount(1000), core_asset.amount(20), true );
+   auto unmatched = create_sell_order_with_ext( buyer_account, test_asset.amount(1000), core_asset.amount(20), true );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    BOOST_CHECK( db.find( second_id ) );
@@ -717,7 +717,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_overpays_vs_huge_lot_check_satoshi_rounding_isT
    BOOST_CHECK_EQUAL( get_balance( seller_account, core_asset ), 89766 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, test_asset.amount(429), core_asset.amount(123), false );
+   auto unmatched = create_sell_order_with_ext( buyer_account, test_asset.amount(429), core_asset.amount(123), false );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    if( unmatched ) wdump((*unmatched));
@@ -762,7 +762,7 @@ BOOST_AUTO_TEST_CASE( taker_sells_through_1to1_bid )
    BOOST_CHECK_EQUAL( get_balance( buyer_account, core_asset ), 9850 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, seller_account, test_asset.amount(100), core_asset.amount(90), false );
+   auto unmatched = create_sell_order_with_ext( seller_account, test_asset.amount(100), core_asset.amount(90), false );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    BOOST_CHECK( !db.find( second_id ) );
@@ -808,7 +808,7 @@ BOOST_AUTO_TEST_CASE( taker_sells_small_lot_too_low_through_1to1 )
    BOOST_CHECK_EQUAL( get_balance( buyer_account, core_asset ), 9850 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, seller_account, test_asset.amount(11), core_asset.amount(5), false );
+   auto unmatched = create_sell_order_with_ext( seller_account, test_asset.amount(11), core_asset.amount(5), false );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    if( unmatched ) wdump((*unmatched));
@@ -852,7 +852,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_small_lot_too_high_through_1to1 )
    BOOST_CHECK_EQUAL( get_balance( seller_account, test_asset ), 9900 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, core_asset.amount(15), test_asset.amount(11), false );
+   auto unmatched = create_sell_order_with_ext( buyer_account, core_asset.amount(15), test_asset.amount(11), false );
    //print_market( "", "" );
    BOOST_CHECK( db.find( first_id ) );
    if( unmatched ) wdump((*unmatched));
@@ -897,7 +897,7 @@ BOOST_AUTO_TEST_CASE( taker_sells_above_1 )
    BOOST_CHECK_EQUAL( get_balance( buyer_account, core_asset ), 9300 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, seller_account, test_asset.amount(300), core_asset.amount(600), false );
+   auto unmatched = create_sell_order_with_ext( seller_account, test_asset.amount(300), core_asset.amount(600), false );
    //print_market( "", "" );
    BOOST_CHECK( !db.find( first_id ) );
    BOOST_CHECK( !db.find( second_id ) );
@@ -946,7 +946,7 @@ BOOST_AUTO_TEST_CASE( taker_sells_below_1 )
    BOOST_CHECK_EQUAL( get_balance( buyer_account, core_asset ), 9925 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, seller_account, test_asset.amount(300), core_asset.amount(50), false );
+   auto unmatched = create_sell_order_with_ext( seller_account, test_asset.amount(300), core_asset.amount(50), false );
    //print_market( "", "" );
    BOOST_CHECK( !db.find( first_id ) );
    BOOST_CHECK( !db.find( second_id ) );
@@ -994,7 +994,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_below_1 )
    BOOST_CHECK_EQUAL( get_balance( seller_account, test_asset ), 9800 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, core_asset.amount(275), test_asset.amount(300), false );
+   auto unmatched = create_sell_order_with_ext( buyer_account, core_asset.amount(275), test_asset.amount(300), false );
    //print_market( "", "" );
    BOOST_CHECK( !db.find( first_id ) );
    BOOST_CHECK( !db.find( second_id ) );
@@ -1041,7 +1041,7 @@ BOOST_AUTO_TEST_CASE( taker_buys_above_1 )
    BOOST_CHECK_EQUAL( get_balance( seller_account, test_asset ), 9800 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, core_asset.amount(1500), test_asset.amount(300), false );
+   auto unmatched = create_sell_order_with_ext( buyer_account, core_asset.amount(1500), test_asset.amount(300), false );
    //print_market( "", "" );
    BOOST_CHECK( !db.find( first_id ) );
    BOOST_CHECK( !db.find( second_id ) );
@@ -1089,7 +1089,7 @@ BOOST_AUTO_TEST_CASE( create_buy_uia_multiple_match_new )
    BOOST_CHECK_EQUAL( get_balance( seller_account, test_asset ), 9700 );
 
    //print_market( "", "" );
-   auto unmatched = create_sell_order_with_ext( db, trx, buyer_account, core_asset.amount(300), test_asset.amount(150), false );
+   auto unmatched = create_sell_order_with_ext( buyer_account, core_asset.amount(300), test_asset.amount(150), false );
    //print_market( "", "" );
    BOOST_CHECK( !db.find( first_id ) );
    BOOST_CHECK( db.find( second_id ) );
