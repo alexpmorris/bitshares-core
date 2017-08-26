@@ -709,6 +709,30 @@ const limit_order_object* database_fixture::create_sell_order( const account_obj
    return db.find<limit_order_object>( processed.operation_results[0].get<object_id_type>() );
 }
 
+const limit_order_object* database_fixture::create_sell_order_with_ext( database& db, signed_transaction& trx, const account_object& user, const asset& amount, const asset& recv, bool isCoreBuySell )
+{
+   //wdump((amount)(recv));
+   limit_order_create_operation buy_order;
+   buy_order.seller = user.id;
+   buy_order.amount_to_sell = amount;
+   buy_order.min_to_receive = recv;
+
+	graphene::chain::limit_order_create_operation::limit_order_flags order_flags;
+	order_flags.isCoreBuySell = isCoreBuySell;
+	extension<graphene::chain::limit_order_create_operation::limit_order_flags> ext;
+	ext.value = order_flags;
+	buy_order.extensions = ext;
+
+   trx.operations.push_back(buy_order);
+   for( auto& op : trx.operations ) db.current_fee_schedule().set_fee(op);
+   trx.validate();
+   auto processed = db.push_transaction(trx, ~0);
+   trx.operations.clear();
+   database_fixture::verify_asset_supplies(db);
+   //wdump((processed));
+   return db.find<limit_order_object>( processed.operation_results[0].get<object_id_type>() );
+}
+
 asset database_fixture::cancel_limit_order( const limit_order_object& order )
 {
   limit_order_cancel_operation cancel_order;
