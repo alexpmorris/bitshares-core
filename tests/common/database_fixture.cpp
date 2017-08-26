@@ -709,7 +709,7 @@ const limit_order_object* database_fixture::create_sell_order( const account_obj
    return db.find<limit_order_object>( processed.operation_results[0].get<object_id_type>() );
 }
 
-const limit_order_object* database_fixture::create_sell_order_with_ext( database& db, signed_transaction& trx, const account_object& user, const asset& amount, const asset& recv, bool isCoreBuySell )
+const limit_order_object* database_fixture::create_sell_order_with_ext( const account_object& user, const asset& amount, const asset& recv, bool isCoreBuySell )
 {
    //wdump((amount)(recv));
    limit_order_create_operation buy_order;
