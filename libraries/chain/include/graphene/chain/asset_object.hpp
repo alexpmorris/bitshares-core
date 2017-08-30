@@ -97,6 +97,10 @@ namespace graphene { namespace chain {
          bool is_transfer_restricted()const { return options.flags & transfer_restricted; }
          bool can_override()const { return options.flags & override_authority; }
          bool allow_confidential()const { return !(options.flags & asset_issuer_permission_flags::disable_confidential); }
+         /// @return true if fees related to this asset must be paid using CORE asset only (ie. BTS)
+         bool is_pay_fees_core_only()const { return options.flags & pay_fees_core_only; }
+         /// @return true if this asset may only be offered for sale by issuer (on market)
+         bool is_exchange_restricted()const { return options.flags & exchange_restricted; }
 
          /// Helper function to get an asset object with the given amount in this asset's type
          asset amount(share_type a)const { return asset(a, id); }
