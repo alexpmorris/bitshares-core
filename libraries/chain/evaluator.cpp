@@ -67,6 +67,16 @@ database& generic_evaluator::db()const { return trx_state->db(); }
             ("acct", fee_paying_account->id)("name", fee_paying_account->name)("a", fee_asset->id)("sym", fee_asset->symbol) );
       }
 
+      if ( fee_asset->is_pay_fees_core_only() )
+      {
+        FC_ASSERT(
+         fee_asset->get_id() == asset_id_type(),
+         "Fees for asset ${asset} must be paid in ${core}",
+         ("asset", fee_asset->symbol)
+         ("core", GRAPHENE_SYMBOL)
+        );
+      }
+      
       if( fee_from_account.asset_id == asset_id_type() )
          core_fee_paid = fee_from_account.amount;
       else
